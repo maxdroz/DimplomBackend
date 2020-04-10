@@ -11,9 +11,11 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "com.sparkjava:spark-core:2.8.0"
     implementation "com.sparkjava:spark-kotlin:1.0.0-alpha"
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
-    implementation "org.slf4j:slf4j-nop<:1.7.13"
+    implementation 'org.postgresql:postgresql:42.1.4'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation "org.slf4j:slf4j-simple:1.7.13"
 }
 
 compileKotlin {
