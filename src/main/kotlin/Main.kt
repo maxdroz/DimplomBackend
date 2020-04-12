@@ -1,27 +1,54 @@
 import discipline.DisciplineController
 import discipline.DisciplineInteractor
+import response.ResponseController
+import io.javalin.Javalin
 import lesson.LessonController
 import lesson.LessonInteractor
-import spark.Spark.*
-import spark.kotlin.port
-import teacher.TeacherContoller
+import login.LoginController
+import office.OfficeController
+import office.OfficeInteractor
+import teacher.TeacherController
 import teacher.TeacherInteractor
 import utils.AddJSONHeader
+import utils.Path
 
 fun main() {
-    port(80)
+    val app = Javalin.create().start(80)
 
-    post("/get/disciplines", DisciplineController.fetchAllDisciplines)
-    post("/get/teachers", TeacherContoller.fetchAllTeachers)
-    post("/get/lessons", LessonController.fetchAllLessons)
+    app.before(LoginController.ensureLoginBeforeEditing)
 
-    after("*", AddJSONHeader.add)
+    app.get(Path.TEACHERS, TeacherController.fetchAllTeachers)
+    app.get(Path.DISCIPLINES, DisciplineController.fetchAllDisciplines)
+    app.get(Path.LESSONS, LessonController.fetchAllLessons)
+    app.get(Path.OFFICES, OfficeController.fetchAllOffices)
+
+    app.post(Path.TEACHERS, TeacherController.addTeacher)
+    app.post(Path.DISCIPLINES, DisciplineController.addDiscipline)
+    app.post(Path.OFFICES, OfficeController.addOffice)
+    app.post(Path.LESSONS, LessonController.addLesson)
+
+    app.patch(Path.TEACHERS, TeacherController.editTeacher)
+    app.patch(Path.DISCIPLINES, DisciplineController.editDiscipline)
+    app.patch(Path.OFFICES, OfficeController.editOffice)
+    app.patch(Path.LESSONS, LessonController.editLesson)
+
+    app.delete(Path.TEACHERS, TeacherController.deleteTeacher)
+    app.delete(Path.DISCIPLINES, DisciplineController.deleteDiscipline)
+    app.delete(Path.OFFICES, OfficeController.deleteOffice)
+    app.delete(Path.LESSONS, LessonController.deleteLesson)
+
+    //responses
+    app.get(Path.LOGIN_REQUIRED, ResponseController.loginRequiredError)
+    app.get(Path.SUCCESS, ResponseController.success)
+    app.get(Path.WRONG_DATA_FORMAT, ResponseController.wrongDataFormat)
+    app.get(Path.DB_ERROR, ResponseController.db_error)
+
+    app.after(AddJSONHeader.add)
 }
 
-class Main {
-    companion object {
-        val disciplineInteractor = DisciplineInteractor(DB.conn)
-        val teacherInteractor = TeacherInteractor(DB.conn)
-        val lessonInteractor = LessonInteractor(DB.conn)
-    }
+object Main {
+    val disciplineInteractor = DisciplineInteractor(DB.conn)
+    val teacherInteractor = TeacherInteractor(DB.conn)
+    val lessonInteractor = LessonInteractor(DB.conn)
+    val officeInteractor = OfficeInteractor(DB.conn)
 }

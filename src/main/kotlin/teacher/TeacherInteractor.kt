@@ -1,6 +1,8 @@
 package teacher
 
 import discipline.Discipline
+import org.slf4j.LoggerFactory
+import java.lang.Exception
 import java.sql.Connection
 import java.sql.ResultSet
 
@@ -13,6 +15,48 @@ class TeacherInteractor(private val connection: Connection) {
             ans.add(res.getTeacher())
         }
         return ans
+    }
+
+    fun add(teacher: Teacher): Boolean {
+        val st = connection.prepareStatement("INSERT INTO teacher values (DEFAULT, ?, ?, ?, ?, ?)")
+        st.setString(1, teacher.name)
+        st.setString(2, teacher.surname)
+        st.setString(3, teacher.patronymic)
+        st.setString(4, teacher.phoneNumber)
+        st.setString(5, teacher.description)
+        return try {
+            st.execute()
+        } catch (e: Exception) {
+            LoggerFactory.getLogger(this.javaClass).error("", e)
+            true
+        }
+    }
+
+    fun delete(id: Int): Boolean {
+        val st = connection.prepareStatement("DELETE FROM teacher WHERE id = ?")
+        st.setInt(1, id)
+        return try {
+            st.execute()
+        } catch (e: Exception) {
+            LoggerFactory.getLogger(this.javaClass).error("", e)
+            true
+        }
+    }
+
+    fun edit(teacher: Teacher): Boolean {
+        val st = connection.prepareStatement("UPDATE teacher SET name = ?, surname = ?, patronymic = ?, phone_number = ?, description = ? WHERE id = ?")
+        st.setString(1, teacher.name)
+        st.setString(2, teacher.surname)
+        st.setString(3, teacher.patronymic)
+        st.setString(4, teacher.phoneNumber)
+        st.setString(5, teacher.description)
+        st.setInt(6, teacher.id)
+        return try {
+            st.execute()
+        } catch (e: Exception) {
+            LoggerFactory.getLogger(this.javaClass).error("", e)
+            true
+        }
     }
 
     companion object {

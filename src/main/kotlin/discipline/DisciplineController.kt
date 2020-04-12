@@ -1,13 +1,39 @@
 package discipline
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import spark.Route
+import io.javalin.http.Handler
+import utils.ResponseGenerator
 
-class DisciplineController {
-    companion object {
-        val fetchAllDisciplines = Route { req, res ->
-            return@Route Gson().toJson(hashMapOf("disciplines" to Main.disciplineInteractor.getAll()))
+object DisciplineController {
+    val fetchAllDisciplines = Handler { ctx ->
+        ctx.html(Gson().toJson(hashMapOf("disciplines" to Main.disciplineInteractor.getAll())))
+    }
+
+    val addDiscipline = Handler { ctx ->
+        ResponseGenerator.generate(ctx, Discipline::class.java) {
+            Main.disciplineInteractor.add(it)
         }
+    }
+
+    val editDiscipline = Handler { ctx ->
+        ResponseGenerator.generate(ctx, Discipline::class.java,
+            dataFormatWrong = {
+                it.id == DISCIPLINE_INVALID_ID
+            },
+            callback = {
+                Main.disciplineInteractor.edit(it)
+            }
+        )
+    }
+
+    val deleteDiscipline = Handler { ctx ->
+        ResponseGenerator.generate(ctx, Discipline::class.java,
+            dataFormatWrong = {
+                it.id == DISCIPLINE_INVALID_ID
+            },
+            callback = {
+                Main.disciplineInteractor.delete(it.id)
+            }
+        )
     }
 }

@@ -1,11 +1,11 @@
 package utils
 
-import spark.Filter
+import io.javalin.http.Handler
 
 class AddJSONHeader {
     companion object {
-        val add = Filter{ req, res ->
-            res.header("Content-Type", "application/json")
+        val add = Handler { ctx ->
+            ctx.header("Content-Type", "application/json")
         }
     }
 }
