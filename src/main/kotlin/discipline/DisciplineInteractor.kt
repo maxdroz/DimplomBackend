@@ -16,37 +16,40 @@ class DisciplineInteractor(private val connection: Connection) {
         return ans
     }
 
-    fun add(discipline: Discipline): Boolean {
+    fun add(discipline: Discipline): String? {
         val st = connection.prepareStatement("INSERT INTO discipline VALUES (DEFAULT, ?)")
         st.setString(1, discipline.name)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun edit(discipline: Discipline): Boolean {
+    fun edit(discipline: Discipline): String? {
         val st = connection.prepareStatement("UPDATE discipline SET name = ? WHERE id = ?")
         st.setString(1, discipline.name)
         st.setInt(2, discipline.id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun delete(id: Int): Boolean {
+    fun delete(id: Int): String? {
         val st = connection.prepareStatement("DELETE FROM discipline WHERE id = ?")
         st.setInt(1, id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 

@@ -2,6 +2,7 @@ package utils
 
 import com.google.gson.Gson
 import io.javalin.http.Context
+import response.showError
 
 object ResponseGenerator {
     fun <T> generate(
@@ -9,14 +10,15 @@ object ResponseGenerator {
         clazz: Class<T>,
         gson: Gson = Gson(),
         dataFormatWrong: (T) -> Boolean = { false },
-        callback: (T) -> Boolean
+        callback: (T) -> String?
     ) {
         val data = gson.fromJson(ctx.body(), clazz)
         if (data == null || dataFormatWrong(data)) {
-            ctx.redirect(Path.WRONG_DATA_FORMAT)
+            ctx.showError("wrong_data_format")
         } else {
-            if (callback(data)) {
-                ctx.redirect(Path.DB_ERROR)
+            val errorMessage = callback(data)
+            if (errorMessage != null) {
+                ctx.showError(errorMessage)
             } else {
                 ctx.redirect(Path.SUCCESS)
             }

@@ -17,7 +17,7 @@ class TeacherInteractor(private val connection: Connection) {
         return ans
     }
 
-    fun add(teacher: Teacher): Boolean {
+    fun add(teacher: Teacher): String? {
         val st = connection.prepareStatement("INSERT INTO teacher values (DEFAULT, ?, ?, ?, ?, ?)")
         st.setString(1, teacher.name)
         st.setString(2, teacher.surname)
@@ -26,24 +26,26 @@ class TeacherInteractor(private val connection: Connection) {
         st.setString(5, teacher.description)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun delete(id: Int): Boolean {
+    fun delete(id: Int): String? {
         val st = connection.prepareStatement("DELETE FROM teacher WHERE id = ?")
         st.setInt(1, id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun edit(teacher: Teacher): Boolean {
+    fun edit(teacher: Teacher): String? {
         val st = connection.prepareStatement("UPDATE teacher SET name = ?, surname = ?, patronymic = ?, phone_number = ?, description = ? WHERE id = ?")
         st.setString(1, teacher.name)
         st.setString(2, teacher.surname)
@@ -53,9 +55,10 @@ class TeacherInteractor(private val connection: Connection) {
         st.setInt(6, teacher.id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 

@@ -19,37 +19,40 @@ class OfficeInteractor(private val connection: Connection) {
         return ans
     }
 
-    fun add(office: Office): Boolean {
+    fun add(office: Office): String? {
         val st = connection.prepareStatement("INSERT INTO office VALUES (DEFAULT, ?)")
         st.setString(1, office.office)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun edit(office: Office): Boolean {
+    fun edit(office: Office): String? {
         val st = connection.prepareStatement("UPDATE office SET office = ? WHERE id = ?")
         st.setString(1, office.office)
         st.setInt(2, office.id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun delete(id: Int): Boolean {
+    fun delete(id: Int): String? {
         val st = connection.prepareStatement("DELETE FROM office WHERE id = ?")
         st.setInt(1, id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 

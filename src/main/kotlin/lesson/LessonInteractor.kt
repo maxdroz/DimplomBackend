@@ -40,7 +40,7 @@ class LessonInteractor(private val connection: Connection) {
         return ans
     }
 
-    fun add(lesson: Lesson): Boolean {
+    fun add(lesson: Lesson): String? {
         val st = connection.prepareStatement("INSERT INTO lesson VALUES (DEFAULT, ?, ?, ?, ?, ?)")
         st.setTimestamp(1, lesson.startTime)
         st.setTimestamp(2, lesson.endTime)
@@ -49,13 +49,14 @@ class LessonInteractor(private val connection: Connection) {
         st.setInt(5, lesson.office.id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun edit(lesson: Lesson): Boolean {
+    fun edit(lesson: Lesson): String? {
         val st = connection.prepareStatement("UPDATE lesson SET start_time = ?, end_time = ?, id_discipline = ?, id_teacher = ?, id_office = ? WHERE id = ?")
         st.setTimestamp(1, lesson.startTime)
         st.setTimestamp(2, lesson.endTime)
@@ -65,20 +66,22 @@ class LessonInteractor(private val connection: Connection) {
         st.setInt(6, lesson.id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 
-    fun delete(id: Int): Boolean {
+    fun delete(id: Int): String? {
         val st = connection.prepareStatement("DELETE FROM lesson WHERE id = ?")
         st.setInt(1, id)
         return try {
             st.execute()
+            null
         } catch (e: Exception) {
             LoggerFactory.getLogger(this.javaClass).error("", e)
-            true
+            e.message
         }
     }
 

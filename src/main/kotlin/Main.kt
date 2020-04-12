@@ -40,8 +40,7 @@ fun main() {
     //responses
     app.get(Path.LOGIN_REQUIRED, ResponseController.loginRequiredError)
     app.get(Path.SUCCESS, ResponseController.success)
-    app.get(Path.WRONG_DATA_FORMAT, ResponseController.wrongDataFormat)
-    app.get(Path.DB_ERROR, ResponseController.db_error)
+    app.get(Path.ERROR, ResponseController.error)
 
     app.after(AddJSONHeader.add)
 }
