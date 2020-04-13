@@ -1,5 +1,7 @@
 package discipline
 
+import office.Office
+import office.OfficeInteractor.Companion.getOffice
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.sql.Connection
@@ -14,6 +16,14 @@ class DisciplineInteractor(private val connection: Connection) {
             ans.add(res.getDiscipline())
         }
         return ans
+    }
+
+    fun get(id: Int): Discipline {
+        val st = connection.prepareStatement("SELECT id as id_discipline, name FROM discipline WHERE id = ?")
+        st.setInt(1, id)
+        val res = st.executeQuery()
+        res.next()
+        return res.getDiscipline()
     }
 
     fun add(discipline: Discipline): String? {

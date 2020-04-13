@@ -19,6 +19,14 @@ class OfficeInteractor(private val connection: Connection) {
         return ans
     }
 
+    fun get(id: Int): Office {
+        val st = connection.prepareStatement("SELECT id as id_office, office FROM office WHERE id = ?")
+        st.setInt(1, id)
+        val res = st.executeQuery()
+        res.next()
+        return res.getOffice()
+    }
+
     fun add(office: Office): String? {
         val st = connection.prepareStatement("INSERT INTO office VALUES (DEFAULT, ?)")
         st.setString(1, office.office)

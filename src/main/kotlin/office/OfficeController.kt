@@ -1,12 +1,18 @@
 package office
 
-import com.google.gson.Gson
+import io.javalin.http.Context
 import io.javalin.http.Handler
+import response.showError
+import utils.Path
 import utils.ResponseGenerator
 
 object OfficeController {
     val fetchAllOffices = Handler { ctx ->
-        ctx.html(Gson().toJson(hashMapOf("offices" to Main.officeInteractor.getAll())))
+        ctx.json(Main.officeInteractor.getAll())
+    }
+
+    val getOffice = Handler {ctx ->
+        ctx.json(Main.officeInteractor.get(ctx.getParamId()))
     }
 
     val addOffice = Handler { ctx ->
@@ -16,24 +22,21 @@ object OfficeController {
     }
 
     val editOffice = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Office::class.java,
-            dataFormatWrong = {
-                it.id == OFFICE_INVALID_ID
-            },
-            callback = {
-                Main.officeInteractor.edit(it)
-            }
-        )
+        ResponseGenerator.generate(ctx, Office::class.java) {
+            Main.officeInteractor.edit(it.copy(id = ctx.getParamId()))
+        }
     }
 
     val deleteOffice = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Office::class.java,
-            dataFormatWrong = {
-                it.id == OFFICE_INVALID_ID
-            },
-            callback = {
-                Main.officeInteractor.delete(it.id)
-            }
-        )
+        val errorMessage = Main.officeInteractor.delete(ctx.getParamId())
+        if (errorMessage != null) {
+            ctx.showError(errorMessage)
+        } else {
+            ctx.redirect(Path.SUCCESS)
+        }
+    }
+
+    private fun Context.getParamId(): Int {
+        return pathParam(":office-id").toIntOrNull() ?: OFFICE_INVALID_ID
     }
 }

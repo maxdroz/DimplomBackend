@@ -1,6 +1,7 @@
 package teacher
 
 import discipline.Discipline
+import discipline.DisciplineInteractor.Companion.getDiscipline
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.sql.Connection
@@ -16,6 +17,15 @@ class TeacherInteractor(private val connection: Connection) {
         }
         return ans
     }
+
+    fun get(id: Int): Teacher {
+        val st = connection.prepareStatement("SELECT id as id_teacher, name as teacher_name, surname, patronymic, phone_number, description FROM teacher WHERE id = ?")
+        st.setInt(1, id)
+        val res = st.executeQuery()
+        res.next()
+        return res.getTeacher()
+    }
+
 
     fun add(teacher: Teacher): String? {
         val st = connection.prepareStatement("INSERT INTO teacher values (DEFAULT, ?, ?, ?, ?, ?)")

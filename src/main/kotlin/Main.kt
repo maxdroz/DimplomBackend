@@ -1,48 +1,93 @@
 import discipline.DisciplineController
 import discipline.DisciplineInteractor
+import group.GroupController
+import group.GroupInteractor
 import response.ResponseController
 import io.javalin.Javalin
+import io.javalin.apibuilder.ApiBuilder.*
 import lesson.LessonController
 import lesson.LessonInteractor
-import login.LoginController
 import office.OfficeController
 import office.OfficeInteractor
 import teacher.TeacherController
 import teacher.TeacherInteractor
-import utils.AddJSONHeader
+import utils.AddHeader
 import utils.Path
 
 fun main() {
     val app = Javalin.create().start(80)
 
-    app.before(LoginController.ensureLoginBeforeEditing)
+//    app.before(LoginController.ensureLoginBeforeEditing)
 
-    app.get(Path.TEACHERS, TeacherController.fetchAllTeachers)
-    app.get(Path.DISCIPLINES, DisciplineController.fetchAllDisciplines)
-    app.get(Path.LESSONS, LessonController.fetchAllLessons)
-    app.get(Path.OFFICES, OfficeController.fetchAllOffices)
+    app.routes {
+        path(Path.TEACHERS) {
+            get(TeacherController.fetchAllTeachers)
+            post(TeacherController.addTeacher)
+            path(":teacher-id") {
+                get(TeacherController.getTeacher)
+                put(TeacherController.editTeacher)
+                delete(TeacherController.deleteTeacher)
+            }
+        }
 
-    app.post(Path.TEACHERS, TeacherController.addTeacher)
-    app.post(Path.DISCIPLINES, DisciplineController.addDiscipline)
-    app.post(Path.OFFICES, OfficeController.addOffice)
-    app.post(Path.LESSONS, LessonController.addLesson)
+        path(Path.DISCIPLINES) {
+            get(DisciplineController.fetchAllDisciplines)
+            post(DisciplineController.addDiscipline)
+            path(":discipline-id") {
+                get(DisciplineController.getDiscipline)
+                put(DisciplineController.editDiscipline)
+                delete(DisciplineController.deleteDiscipline)
+            }
+        }
 
-    app.patch(Path.TEACHERS, TeacherController.editTeacher)
-    app.patch(Path.DISCIPLINES, DisciplineController.editDiscipline)
-    app.patch(Path.OFFICES, OfficeController.editOffice)
-    app.patch(Path.LESSONS, LessonController.editLesson)
+        path(Path.OFFICES) {
+            get(OfficeController.fetchAllOffices)
+            post(OfficeController.addOffice)
+            path(":office-id") {
+                get(OfficeController.getOffice)
+                put(OfficeController.editOffice)
+                delete(OfficeController.deleteOffice)
+            }
+        }
 
-    app.delete(Path.TEACHERS, TeacherController.deleteTeacher)
-    app.delete(Path.DISCIPLINES, DisciplineController.deleteDiscipline)
-    app.delete(Path.OFFICES, OfficeController.deleteOffice)
-    app.delete(Path.LESSONS, LessonController.deleteLesson)
+        path(Path.LESSONS) {
+            get(LessonController.fetchAllLessons)
+            post(LessonController.addLesson)
+            path(":lesson-id") {
+                get(LessonController.getLesson)
+                put(LessonController.editLesson)
+                delete(LessonController.deleteLesson)
+            }
+        }
+
+        path(Path.GROUPS) {
+            get(GroupController.fetchAllGroups)
+            post(GroupController.addGroup)
+            path(":group-id") {
+                get(GroupController.getGroup)
+                put(GroupController.editGroup)
+                delete(GroupController.deleteGroup)
+            }
+        }
+
+        path(Path.USER_API) {
+            path(Path.TEACHERS) {
+                get(TeacherController.getTeacher)
+            }
+            path(Path.LESSONS) {
+                get(LessonController.fetchAllLessonsForUser)
+            }
+        }
+    }
 
     //responses
     app.get(Path.LOGIN_REQUIRED, ResponseController.loginRequiredError)
     app.get(Path.SUCCESS, ResponseController.success)
     app.get(Path.ERROR, ResponseController.error)
 
-    app.after(AddJSONHeader.add)
+    app.after(AddHeader.addJSONHeader)
+    app.after(AddHeader.addCrossOriginHeader)
+    app.after(AddHeader.addXTotalCountHeader)
 }
 
 object Main {
@@ -50,4 +95,5 @@ object Main {
     val teacherInteractor = TeacherInteractor(DB.conn)
     val lessonInteractor = LessonInteractor(DB.conn)
     val officeInteractor = OfficeInteractor(DB.conn)
+    val groupInteractor = GroupInteractor(DB.conn)
 }
