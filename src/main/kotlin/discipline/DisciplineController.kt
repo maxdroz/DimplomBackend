@@ -1,15 +1,13 @@
 package discipline
 
+import com.google.gson.Gson
 import io.javalin.http.Context
 import io.javalin.http.Handler
-import response.showError
-import teacher.TEACHER_INVALID_ID
-import utils.Path
-import utils.ResponseGenerator
+import utils.getAllParams
 
 object DisciplineController {
     val fetchAllDisciplines = Handler { ctx ->
-        ctx.json(Main.disciplineInteractor.getAll())
+        ctx.json(Main.disciplineInteractor.getAll(ctx.getAllParams()))
     }
 
     val getDiscipline = Handler { ctx ->
@@ -17,24 +15,17 @@ object DisciplineController {
     }
 
     val addDiscipline = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Discipline::class.java) {
-            Main.disciplineInteractor.add(it)
-        }
+        val data = Gson().fromJson(ctx.body(), Discipline::class.java)
+        ctx.json(Main.disciplineInteractor.add(data))
     }
 
     val editDiscipline = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Discipline::class.java) {
-            Main.disciplineInteractor.edit(it.copy(id = ctx.getParamId()))
-        }
+        val data = Gson().fromJson(ctx.body(), Discipline::class.java).copy(id = ctx.getParamId())
+        ctx.json(Main.disciplineInteractor.edit(data))
     }
 
     val deleteDiscipline = Handler { ctx ->
-        val errorMessage = Main.disciplineInteractor.delete(ctx.getParamId())
-        if (errorMessage != null) {
-            ctx.showError(errorMessage)
-        } else {
-            ctx.redirect(Path.SUCCESS)
-        }
+        ctx.json(Main.disciplineInteractor.delete(ctx.getParamId()))
     }
 
     private fun Context.getParamId(): Int {

@@ -2,19 +2,15 @@ package lesson
 
 import com.google.gson.*
 import com.google.gson.annotations.Expose
-import discipline.DISCIPLINE_INVALID_ID
 import discipline.Discipline
-import group.GROUP_INVALID_ID
 import group.Group
 import io.javalin.http.Context
 import io.javalin.http.Handler
 import office.Office
-import response.showError
-import teacher.TEACHER_INVALID_ID
 import teacher.Teacher
-import utils.Path
-import utils.ResponseGenerator
+import utils.getAllParams
 import java.sql.Timestamp
+import java.util.*
 
 object LessonController {
     private val userGson by lazy {
@@ -41,7 +37,13 @@ object LessonController {
             return@JsonSerializer JsonPrimitive(src.name)
         }
         val timestampDeserializer = JsonDeserializer { src, typeOfSrc, context ->
-            return@JsonDeserializer Timestamp(src.asLong)
+            return@JsonDeserializer if (src.asJsonPrimitive.isNumber) {
+                Timestamp(src.asLong)
+            } else {
+                val str = src.asString.replace('T', ' ').removeSuffix("Z")
+                println(str)
+                Timestamp(Timestamp.valueOf(str).time + TimeZone.getDefault().rawOffset)
+            }
         }
         val disciplineDeserializer = JsonDeserializer { src, typeOfSrc, context ->
             return@JsonDeserializer Discipline(src.asInt)
@@ -99,7 +101,7 @@ object LessonController {
     }
 
     val fetchAllLessons = Handler { ctx ->
-        ctx.html(adminGson.toJson(Main.lessonInteractor.getAll()))
+        ctx.html(adminGson.toJson(Main.lessonInteractor.getAll(ctx.getAllParams())))
     }
 
     val getLesson = Handler { ctx ->
@@ -107,44 +109,17 @@ object LessonController {
     }
 
     val addLesson = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Lesson::class.java, userGson,
-            dataFormatWrong = {
-                it.discipline.id == DISCIPLINE_INVALID_ID ||
-                        it.office.id == DISCIPLINE_INVALID_ID ||
-                        it.teacher.id == TEACHER_INVALID_ID ||
-                        it.group.id == GROUP_INVALID_ID ||
-                        it.startTime === LESSON_INVALID_TIMESTAMP ||
-                        it.endTime === LESSON_INVALID_TIMESTAMP
-            },
-            callback = {
-                Main.lessonInteractor.add(it)
-            }
-        )
+        val data = userGson.fromJson(ctx.body(), Lesson::class.java)
+        ctx.html(adminGson.toJson(Main.lessonInteractor.add(data)))
     }
 
     val editLesson = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Lesson::class.java, userGson,
-            dataFormatWrong = {
-                it.discipline.id == DISCIPLINE_INVALID_ID ||
-                        it.office.id == DISCIPLINE_INVALID_ID ||
-                        it.teacher.id == TEACHER_INVALID_ID ||
-                        it.group.id == GROUP_INVALID_ID ||
-                        it.startTime === LESSON_INVALID_TIMESTAMP ||
-                        it.endTime === LESSON_INVALID_TIMESTAMP
-            },
-            callback = {
-                Main.lessonInteractor.edit(it.copy(id = ctx.getParamId()))
-            }
-        )
+        val data = userGson.fromJson(ctx.body(), Lesson::class.java).copy(id = ctx.getParamId())
+        ctx.html(adminGson.toJson(Main.lessonInteractor.edit(data)))
     }
 
     val deleteLesson = Handler { ctx ->
-        val errorMessage = Main.lessonInteractor.delete(ctx.getParamId())
-        if (errorMessage != null) {
-            ctx.showError(errorMessage)
-        } else {
-            ctx.redirect(Path.SUCCESS)
-        }
+        ctx.html(adminGson.toJson(Main.lessonInteractor.delete(ctx.getParamId())))
     }
 
     private fun Context.getParamId(): Int {

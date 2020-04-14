@@ -1,14 +1,13 @@
 package office
 
+import com.google.gson.Gson
 import io.javalin.http.Context
 import io.javalin.http.Handler
-import response.showError
-import utils.Path
-import utils.ResponseGenerator
+import utils.getAllParams
 
 object OfficeController {
     val fetchAllOffices = Handler { ctx ->
-        ctx.json(Main.officeInteractor.getAll())
+        ctx.json(Main.officeInteractor.getAll(ctx.getAllParams()))
     }
 
     val getOffice = Handler {ctx ->
@@ -16,24 +15,17 @@ object OfficeController {
     }
 
     val addOffice = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Office::class.java) {
-            Main.officeInteractor.add(it)
-        }
+        val data = Gson().fromJson(ctx.body(), Office::class.java)
+        ctx.json(Main.officeInteractor.add(data))
     }
 
     val editOffice = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Office::class.java) {
-            Main.officeInteractor.edit(it.copy(id = ctx.getParamId()))
-        }
+        val data = Gson().fromJson(ctx.body(), Office::class.java).copy(id = ctx.getParamId())
+        ctx.json(Main.officeInteractor.edit(data))
     }
 
     val deleteOffice = Handler { ctx ->
-        val errorMessage = Main.officeInteractor.delete(ctx.getParamId())
-        if (errorMessage != null) {
-            ctx.showError(errorMessage)
-        } else {
-            ctx.redirect(Path.SUCCESS)
-        }
+        ctx.json(Main.officeInteractor.delete(ctx.getParamId()))
     }
 
     private fun Context.getParamId(): Int {

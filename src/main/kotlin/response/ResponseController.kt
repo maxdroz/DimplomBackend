@@ -26,5 +26,5 @@ object ResponseController {
 
 fun Context.showError(reason: String) {
     sessionAttribute(ERROR_REASON_KEY, reason)
-    redirect(Path.ERROR)
+//    redirect(Path.ERROR)
 }

@@ -1,14 +1,13 @@
 package teacher
 
+import com.google.gson.Gson
 import io.javalin.http.Context
 import io.javalin.http.Handler
-import response.showError
-import utils.Path
-import utils.ResponseGenerator
+import utils.getAllParams
 
 object TeacherController {
     val fetchAllTeachers = Handler { ctx ->
-        ctx.json(Main.teacherInteractor.getAll())
+        ctx.json(Main.teacherInteractor.getAll(ctx.getAllParams()))
     }
 
     val getTeacher = Handler { ctx ->
@@ -16,24 +15,17 @@ object TeacherController {
     }
 
     val addTeacher = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Teacher::class.java) {
-            Main.teacherInteractor.add(it)
-        }
+        val data = Gson().fromJson(ctx.body(), Teacher::class.java)
+        ctx.json(Main.teacherInteractor.add(data))
     }
 
     val editTeacher = Handler { ctx ->
-        ResponseGenerator.generate(ctx, Teacher::class.java) {
-                Main.teacherInteractor.edit(it.copy(id = ctx.getParamId()))
-            }
+        val data = Gson().fromJson(ctx.body(), Teacher::class.java).copy(id = ctx.getParamId())
+        ctx.json(Main.teacherInteractor.edit(data))
     }
 
     val deleteTeacher = Handler { ctx ->
-        val errorMessage = Main.teacherInteractor.delete(ctx.getParamId())
-        if (errorMessage != null) {
-            ctx.showError(errorMessage)
-        } else {
-            ctx.redirect(Path.SUCCESS)
-        }
+        ctx.json(Main.teacherInteractor.delete(ctx.getParamId()))
     }
 
     private fun Context.getParamId(): Int {

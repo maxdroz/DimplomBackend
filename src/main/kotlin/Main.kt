@@ -1,24 +1,27 @@
 import discipline.DisciplineController
-import discipline.DisciplineInteractor
+import discipline.DisciplineInteractorNew
 import group.GroupController
-import group.GroupInteractor
+import group.GroupInteractorNew
 import response.ResponseController
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
 import lesson.LessonController
-import lesson.LessonInteractor
+import lesson.LessonInteractorNew
 import office.OfficeController
-import office.OfficeInteractor
+import office.OfficeInteractorNew
 import teacher.TeacherController
-import teacher.TeacherInteractor
+import teacher.TeacherInteractorNew
 import utils.AddHeader
 import utils.Path
 
 fun main() {
-    val app = Javalin.create().start(80)
+    val app = Javalin.create { config ->
+        config.enableDevLogging()
+        config.enableCorsForAllOrigins()
+    }.start(80)
 
 //    app.before(LoginController.ensureLoginBeforeEditing)
-
+//    app.options("*", OptionsController.optionsRequest)
     app.routes {
         path(Path.TEACHERS) {
             get(TeacherController.fetchAllTeachers)
@@ -91,9 +94,9 @@ fun main() {
 }
 
 object Main {
-    val disciplineInteractor = DisciplineInteractor(DB.conn)
-    val teacherInteractor = TeacherInteractor(DB.conn)
-    val lessonInteractor = LessonInteractor(DB.conn)
-    val officeInteractor = OfficeInteractor(DB.conn)
-    val groupInteractor = GroupInteractor(DB.conn)
+    val disciplineInteractor = DisciplineInteractorNew(DB.conn)
+    val teacherInteractor = TeacherInteractorNew(DB.conn)
+    val lessonInteractor = LessonInteractorNew(DB.conn)
+    val officeInteractor = OfficeInteractorNew(DB.conn)
+    val groupInteractor = GroupInteractorNew(DB.conn)
 }
