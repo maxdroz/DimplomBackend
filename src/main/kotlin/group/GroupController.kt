@@ -1,13 +1,16 @@
 package group
 
 import com.google.gson.Gson
+import common.getCommonFilterWithSql
+import common.getIds
+import common.responseCanDelete
 import io.javalin.http.Context
 import io.javalin.http.Handler
 import utils.getAllParams
 
 object GroupController {
     val fetchAllGroups = Handler { ctx ->
-        ctx.json(Main.groupInteractor.getAll(ctx.getAllParams()))
+        ctx.json(Main.groupInteractor.getAll(ctx.getAllParams(), ctx.getCommonFilterWithSql()))
     }
 
     val getGroup = Handler { ctx ->
@@ -26,6 +29,10 @@ object GroupController {
 
     val deleteGroup = Handler { ctx ->
         ctx.json(Main.groupInteractor.delete(ctx.getParamId()))
+    }
+
+    val canDeleteGroup = Handler { ctx ->
+        ctx.responseCanDelete(Main.groupInteractor.canBeDeleted(ctx.getIds()))
     }
 
     private fun Context.getParamId(): Int {

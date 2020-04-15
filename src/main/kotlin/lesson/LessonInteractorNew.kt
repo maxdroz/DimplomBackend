@@ -1,6 +1,8 @@
 package lesson
 
+import common.Filter
 import common.Interactor
+import common.LessonFilter
 import discipline.Discipline
 import group.Group
 import office.Office
@@ -9,7 +11,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-class LessonInteractorNew(private val connection: Connection) : Interactor<Lesson>(connection) {
+class LessonInteractorNew(private val connection: Connection) : Interactor<Lesson, LessonFilter>(connection) {
     override val tableParams: String
         get() = "*"
     override val tableName: String
@@ -18,6 +20,23 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
         get() = "INSERT INTO lesson VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)"
     override val editQuery: String
         get() = "UPDATE lesson SET start_time = ?, end_time = ?, id_discipline = ?, id_teacher = ?, id_office = ?, id_group = ? WHERE id = ?"
+    override val referenceName: String
+        get() = ""
+
+    override fun getSearchPathQuery(filter: LessonFilter): String {
+        val teacher = if(filter.teacher != null) "AND id_teacher = ?" else ""
+        val office = if(filter.office != null) "AND id_office = ?" else ""
+        val group = if(filter.group != null) "AND id_group = ?" else ""
+        return "WHERE 1 = 1 $teacher $office $group "
+    }
+
+    @Suppress("UNUSED_CHANGED_VALUE")
+    override fun addParamsToQueryForSearch(st: PreparedStatement, filter: LessonFilter) {
+        var id = 1
+        if(filter.teacher != null) st.setInt(id++, filter.teacher)
+        if(filter.office != null) st.setInt(id++, filter.office)
+        if(filter.group != null) st.setInt(id++, filter.group)
+    }
 
     override fun addParamsToQueryForInsert(st: PreparedStatement, obj: Lesson) {
         st.setTimestamp(1, obj.startTime)

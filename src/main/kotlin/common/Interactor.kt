@@ -5,22 +5,35 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-abstract class Interactor <T> (private val connection: Connection) {
+abstract class Interactor<T, Filter>(private val connection: Connection) {
     abstract val tableParams: String
     abstract val tableName: String
     abstract val insertQuery: String
     abstract val editQuery: String
+    abstract val referenceName: String
 
-    fun getAll(params: GetAllParams?): List<T> {
+    abstract fun addParamsToQueryForSearch(st: PreparedStatement, filter: Filter)
+    abstract fun getSearchPathQuery(filter: Filter): String
+
+    fun getAll(params: GetAllParams?, filter: Filter?): List<T> {
+        val searchQuery = if (filter == null) "" else getSearchPathQuery(filter)
         val query = when (params) {
-            null -> "SELECT $tableParams FROM $tableName"
-            else -> "SELECT $tableParams FROM $tableName ORDER BY ${params.sortBy.toDBName()} ${params.order.name} LIMIT ? OFFSET ?"
+            null -> "SELECT $tableParams FROM $tableName $searchQuery"
+            else -> "SELECT $tableParams FROM $tableName $searchQuery ORDER BY ${params.sortBy.toDBName()} ${params.order.name} LIMIT ? OFFSET ?"
         }
         val st = connection.prepareStatement(query)
+        if (filter != null) {
+            addParamsToQueryForSearch(st, filter)
+        }
+        val paramInSearchCount = if (filter != null) {
+            getSearchPathQuery(filter).count { it == '?' }
+        } else {
+            0
+        }
         when {
             params != null -> {
-                st.setInt(1, params.to - params.from)
-                st.setInt(2, params.from)
+                st.setInt(paramInSearchCount + 1, params.to - params.from)
+                st.setInt(paramInSearchCount + 2, params.from)
             }
         }
         val res = st.executeQuery()
@@ -76,6 +89,15 @@ abstract class Interactor <T> (private val connection: Connection) {
         val res = st.executeQuery("SELECT COUNT(*) FROM $tableName")
         res.next()
         return res.getInt(1)
+    }
+
+    fun canBeDeleted(ids: List<Int>): Boolean {
+        val st = connection.prepareStatement("SELECT COUNT(*) FROM lesson WHERE $referenceName = ANY (?)")
+        val arr = connection.createArrayOf("integer", ids.toTypedArray())
+        st.setArray(1, arr)
+        val res = st.executeQuery()
+        res.next()
+        return res.getInt(1) == 0
     }
 
     abstract fun ResultSet.getObject(): T

@@ -2,6 +2,7 @@ package lesson
 
 import com.google.gson.*
 import com.google.gson.annotations.Expose
+import common.getLessonFilter
 import discipline.Discipline
 import group.Group
 import io.javalin.http.Context
@@ -101,7 +102,7 @@ object LessonController {
     }
 
     val fetchAllLessons = Handler { ctx ->
-        ctx.html(adminGson.toJson(Main.lessonInteractor.getAll(ctx.getAllParams())))
+        ctx.html(adminGson.toJson(Main.lessonInteractor.getAll(ctx.getAllParams(), ctx.getLessonFilter())))
     }
 
     val getLesson = Handler { ctx ->
@@ -120,6 +121,10 @@ object LessonController {
 
     val deleteLesson = Handler { ctx ->
         ctx.html(adminGson.toJson(Main.lessonInteractor.delete(ctx.getParamId())))
+    }
+
+    val canDeleteLesson = Handler { ctx ->
+        ctx.json(mapOf("result" to "success"))
     }
 
     private fun Context.getParamId(): Int {

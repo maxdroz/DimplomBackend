@@ -1,13 +1,16 @@
 package discipline
 
 import com.google.gson.Gson
+import common.getCommonFilterWithSql
+import common.getIds
+import common.responseCanDelete
 import io.javalin.http.Context
 import io.javalin.http.Handler
 import utils.getAllParams
 
 object DisciplineController {
     val fetchAllDisciplines = Handler { ctx ->
-        ctx.json(Main.disciplineInteractor.getAll(ctx.getAllParams()))
+        ctx.json(Main.disciplineInteractor.getAll(ctx.getAllParams(), ctx.getCommonFilterWithSql()))
     }
 
     val getDiscipline = Handler { ctx ->
@@ -26,6 +29,10 @@ object DisciplineController {
 
     val deleteDiscipline = Handler { ctx ->
         ctx.json(Main.disciplineInteractor.delete(ctx.getParamId()))
+    }
+
+    val canDeleteDiscipline = Handler { ctx ->
+        ctx.responseCanDelete(Main.disciplineInteractor.canBeDeleted(ctx.getIds()))
     }
 
     private fun Context.getParamId(): Int {

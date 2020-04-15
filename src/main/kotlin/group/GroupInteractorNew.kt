@@ -1,11 +1,13 @@
 package group
 
+import common.CommonFilter
+import common.Filter
 import common.Interactor
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-class GroupInteractorNew(connection: Connection) : Interactor<Group>(connection) {
+class GroupInteractorNew(connection: Connection) : Interactor<Group, CommonFilter>(connection) {
     override val tableParams: String
         get() = "id as id_group, name as group_name"
     override val tableName: String
@@ -14,6 +16,14 @@ class GroupInteractorNew(connection: Connection) : Interactor<Group>(connection)
         get() = "INSERT INTO \"group\" VALUES (DEFAULT, ?)"
     override val editQuery: String
         get() = "UPDATE \"group\" SET name = ? WHERE id = ?"
+    override val referenceName: String
+        get() = "id_group"
+
+    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE CONCAT(id, ' ', name) LIKE ?"
+
+    override fun addParamsToQueryForSearch(st: PreparedStatement, filter: CommonFilter) {
+        st.setString(1, filter.q)
+    }
 
     override fun addParamsToQueryForInsert(st: PreparedStatement, obj: Group) {
         st.setString(1, obj.name)

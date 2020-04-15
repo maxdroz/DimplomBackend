@@ -5,7 +5,7 @@ import java.sql.DriverManager
 class DB {
     companion object {
         val conn by lazy {
-            val url = "jdbc:postgresql://localhost/testdb"
+            val url = "jdbc:postgresql://192.168.0.25/testdb"
             val conn = DriverManager.getConnection(url, "postgres", "a")
             var script = ""
             FileReader(File("init.sql")).use {

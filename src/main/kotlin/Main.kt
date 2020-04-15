@@ -26,6 +26,7 @@ fun main() {
         path(Path.TEACHERS) {
             get(TeacherController.fetchAllTeachers)
             post(TeacherController.addTeacher)
+            post("/check", TeacherController.canDeleteTeacher)
             path(":teacher-id") {
                 get(TeacherController.getTeacher)
                 put(TeacherController.editTeacher)
@@ -36,6 +37,7 @@ fun main() {
         path(Path.DISCIPLINES) {
             get(DisciplineController.fetchAllDisciplines)
             post(DisciplineController.addDiscipline)
+            post("/check", DisciplineController.canDeleteDiscipline)
             path(":discipline-id") {
                 get(DisciplineController.getDiscipline)
                 put(DisciplineController.editDiscipline)
@@ -46,6 +48,7 @@ fun main() {
         path(Path.OFFICES) {
             get(OfficeController.fetchAllOffices)
             post(OfficeController.addOffice)
+            post("/check", OfficeController.canDeleteOffice)
             path(":office-id") {
                 get(OfficeController.getOffice)
                 put(OfficeController.editOffice)
@@ -53,23 +56,25 @@ fun main() {
             }
         }
 
-        path(Path.LESSONS) {
-            get(LessonController.fetchAllLessons)
-            post(LessonController.addLesson)
-            path(":lesson-id") {
-                get(LessonController.getLesson)
-                put(LessonController.editLesson)
-                delete(LessonController.deleteLesson)
-            }
-        }
-
         path(Path.GROUPS) {
             get(GroupController.fetchAllGroups)
             post(GroupController.addGroup)
+            post("/check", GroupController.canDeleteGroup)
             path(":group-id") {
                 get(GroupController.getGroup)
                 put(GroupController.editGroup)
                 delete(GroupController.deleteGroup)
+            }
+        }
+
+        path(Path.LESSONS) {
+            get(LessonController.fetchAllLessons)
+            post(LessonController.addLesson)
+            post("/check", LessonController.canDeleteLesson)
+            path(":lesson-id") {
+                get(LessonController.getLesson)
+                put(LessonController.editLesson)
+                delete(LessonController.deleteLesson)
             }
         }
 
