@@ -93,7 +93,7 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
                     "INNER JOIN discipline ON lesson.id_discipline = discipline.id " +
                     "INNER JOIN teacher ON lesson.id_teacher = teacher.id " +
                     "INNER JOIN office ON lesson.id_office = office.id " +
-                    "INNER JOIN \"group\" ON lesson.id_group = \"group\".id " + whereStatement
+                    "INNER JOIN \"group\" ON lesson.id_group = \"group\".id ORDER BY start_time " + whereStatement
         val st = connection.prepareStatement(query)
         when {
             from != null && to == null -> st.setLong(1, from)
