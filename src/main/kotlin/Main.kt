@@ -85,7 +85,7 @@ fun main() {
 
         path(Path.USER_API) {
             path(Path.TEACHERS) {
-                get(TeacherController.getTeacher)
+                get(TeacherController.fetchAllTeachers)
             }
             path(Path.LESSONS) {
                 get(LessonController.fetchAllLessonsForUser)
