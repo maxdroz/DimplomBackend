@@ -3,6 +3,7 @@ package group
 import common.CommonFilter
 import common.Filter
 import common.Interactor
+import utils.GetAllParams
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -40,4 +41,7 @@ class GroupInteractorNew(connection: Connection) : Interactor<Group, CommonFilte
         return Group(id, group)
     }
 
+    fun getAllUser(params: GetAllParams?, filter: CommonFilter?): List<String> {
+        return getAll(params, filter).map { it.name }
+    }
 }

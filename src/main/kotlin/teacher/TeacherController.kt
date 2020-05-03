@@ -35,6 +35,7 @@ object TeacherController {
         ctx.responseCanDelete(Main.teacherInteractor.canBeDeleted(ctx.getIds()))
     }
 
+
     private fun Context.getParamId(): Int {
         return pathParam(":teacher-id").toIntOrNull() ?: TEACHER_INVALID_ID
     }

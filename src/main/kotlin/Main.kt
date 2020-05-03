@@ -22,6 +22,11 @@ fun main() {
 
 //    app.before(LoginController.ensureLoginBeforeEditing)
 //    app.options("*", OptionsController.optionsRequest)
+    app.before {
+        Thread.sleep(1000)
+    }
+
+
     app.routes {
         path(Path.TEACHERS) {
             get(TeacherController.fetchAllTeachers)
@@ -84,6 +89,9 @@ fun main() {
             }
             path(Path.LESSONS) {
                 get(LessonController.fetchAllLessonsForUser)
+            }
+            path(Path.GROUPS) {
+                get(GroupController.fetchAllGroupsUser)
             }
         }
     }

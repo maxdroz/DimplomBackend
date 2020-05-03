@@ -35,6 +35,10 @@ object GroupController {
         ctx.responseCanDelete(Main.groupInteractor.canBeDeleted(ctx.getIds()))
     }
 
+    val fetchAllGroupsUser = Handler { ctx ->
+        ctx.json(Main.groupInteractor.getAllUser(ctx.getAllParams(), ctx.getCommonFilterWithSql()))
+    }
+
     private fun Context.getParamId(): Int {
         return pathParam(":group-id").toIntOrNull() ?: GROUP_INVALID_ID
     }
