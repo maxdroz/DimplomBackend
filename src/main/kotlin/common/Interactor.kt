@@ -5,7 +5,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-abstract class Interactor<T, FilterClass : Filter>(private val connection: Connection) {
+abstract class Interactor<T : Model<T>, FilterClass : Filter>(private val connection: Connection) {
     abstract val tableParams: String
     abstract val tableName: String
     abstract val insertQuery: String
@@ -45,7 +45,7 @@ abstract class Interactor<T, FilterClass : Filter>(private val connection: Conne
     }
 
     fun getAllCountNoPagination(filter: FilterClass?): Int {
-        if(filter == null) return getCount()
+        if (filter == null) return getCount()
         val query = "SELECT COUNT(*) FROM $tableName ${getSearchPathQuery(filter)}"
         val st = connection.prepareStatement(query)
         addParamsToQueryForSearch(st, filter)
@@ -74,7 +74,7 @@ abstract class Interactor<T, FilterClass : Filter>(private val connection: Conne
 
     fun add(obj: T): T {
         val st = connection.prepareStatement("$insertQuery RETURNING $tableParams")
-        addParamsToQueryForInsert(st, obj)
+        addParamsToQueryForInsert(st, obj.trimmed())
         val res = st.executeQuery()
         res.next()
         return res.getObject()
@@ -84,7 +84,7 @@ abstract class Interactor<T, FilterClass : Filter>(private val connection: Conne
 
     fun edit(obj: T): T {
         val st = connection.prepareStatement("$editQuery RETURNING $tableParams")
-        addParamsToQueryForEdit(st, obj)
+        addParamsToQueryForEdit(st, obj.trimmed())
         val res = st.executeQuery()
         res.next()
         return res.getObject()

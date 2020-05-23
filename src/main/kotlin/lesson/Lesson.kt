@@ -1,11 +1,10 @@
 package lesson
 
-import com.google.gson.annotations.Expose
+import common.Model
 import discipline.Discipline
 import group.Group
 import office.Office
 import teacher.Teacher
-import java.sql.Time
 import java.sql.Timestamp
 
 const val LESSON_INVALID_ID = -1
@@ -19,4 +18,13 @@ data class Lesson(
     val teacher: Teacher = Teacher(),
     val office: Office = Office(),
     val group: Group = Group()
-)
+): Model<Lesson> {
+    override fun trimmed(): Lesson {
+        return copy(
+                discipline = discipline.trimmed(),
+                teacher = teacher.trimmed(),
+                office = office.trimmed(),
+                group = group.trimmed()
+        )
+    }
+}
