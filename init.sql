@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS "lesson" (
 CREATE TABLE IF NOT EXISTS "discipline" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
+	"short_name" TEXT NOT NULL,
 	CONSTRAINT "discipline_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE

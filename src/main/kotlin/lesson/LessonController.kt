@@ -29,9 +29,6 @@ object LessonController {
         val timestampSerializer = JsonSerializer<Timestamp> { src, _, _ ->
             return@JsonSerializer JsonPrimitive(src.toInstant().toEpochMilli())
         }
-        val disciplineSerializer = JsonSerializer<Discipline> { src, _, _ ->
-            return@JsonSerializer JsonPrimitive(src.name)
-        }
         val officeSerializer = JsonSerializer<Office> { src, _, _ ->
             return@JsonSerializer JsonPrimitive(src.office)
         }
@@ -65,7 +62,6 @@ object LessonController {
         builder.registerTypeAdapter(Teacher::class.java, teacherDeserializer)
         builder.registerTypeAdapter(Group::class.java, groupDeserializer)
         builder.registerTypeAdapter(Timestamp::class.java, timestampSerializer)
-        builder.registerTypeAdapter(Discipline::class.java, disciplineSerializer)
         builder.registerTypeAdapter(Office::class.java, officeSerializer)
         builder.registerTypeAdapter(Group::class.java, groupSerializer)
         builder.create()

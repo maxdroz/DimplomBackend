@@ -88,7 +88,7 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
             else -> ""
         }
         val query =
-            "SELECT lesson.id, start_time, end_time, id_discipline, id_teacher, id_office, id_group, \"group\".name as group_name, discipline.name, teacher.name as teacher_name, surname, patronymic, phone_number, description, office " +
+            "SELECT lesson.id, start_time, end_time, id_discipline, id_teacher, id_office, id_group, \"group\".name as group_name, discipline.name, teacher.name as teacher_name, surname, patronymic, phone_number, description, office, discipline.short_name " +
                     "FROM lesson " +
                     "INNER JOIN discipline ON lesson.id_discipline = discipline.id " +
                     "INNER JOIN teacher ON lesson.id_teacher = teacher.id " +
@@ -141,7 +141,8 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
     private fun ResultSet.getDiscipline(): Discipline {
         val id = getInt("id_discipline")
         val name = getString("name")
-        return Discipline(id, name)
+        val shortName = getString("short_name")
+        return Discipline(id, name, shortName)
     }
 
     private fun ResultSet.getOffice(): Office {
