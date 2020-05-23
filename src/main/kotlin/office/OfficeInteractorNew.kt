@@ -18,7 +18,7 @@ class OfficeInteractorNew(connection: Connection): Interactor<Office, CommonFilt
     override val referenceName: String
         get() = "id_office"
 
-    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE CONCAT(id, ' ', office) LIKE ?"
+    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE LOWER(CONCAT(id, ' ', office)) LIKE LOWER(?)"
 
     override fun addParamsToQueryForSearch(st: PreparedStatement, filter: CommonFilter) {
         st.setString(1, filter.q)

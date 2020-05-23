@@ -18,7 +18,7 @@ class TeacherInteractorNew(connection: Connection): Interactor<Teacher, CommonFi
     override val referenceName: String
         get() = "id_teacher"
 
-    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE CONCAT(id, ' ', name, ' ', surname, ' ', patronymic, ' ', phone_number, ' ', description) LIKE ?"
+    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE LOWER(CONCAT(id, ' ', name, ' ', surname, ' ', patronymic, ' ', phone_number, ' ', description)) LIKE LOWER(?)"
 
     override fun addParamsToQueryForSearch(st: PreparedStatement, filter: CommonFilter) {
         st.setString(1, filter.q)

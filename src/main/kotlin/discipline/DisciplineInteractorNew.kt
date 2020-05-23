@@ -20,7 +20,7 @@ class DisciplineInteractorNew(connection: Connection) : Interactor<Discipline, C
     override val referenceName: String
         get() = "id_discipline"
 
-    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE CONCAT(id, ' ', name) LIKE ?"
+    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE LOWER(CONCAT(id, ' ', name)) LIKE LOWER(?)"
 
     override fun addParamsToQueryForSearch(st: PreparedStatement, filter: CommonFilter) {
         st.setString(1, filter.q)

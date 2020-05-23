@@ -20,7 +20,7 @@ class GroupInteractorNew(connection: Connection) : Interactor<Group, CommonFilte
     override val referenceName: String
         get() = "id_group"
 
-    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE CONCAT(id, ' ', name) LIKE ?"
+    override fun getSearchPathQuery(filter: CommonFilter): String = "WHERE LOWER(CONCAT(id, ' ', name)) LIKE LOWER(?)"
 
     override fun addParamsToQueryForSearch(st: PreparedStatement, filter: CommonFilter) {
         st.setString(1, filter.q)
