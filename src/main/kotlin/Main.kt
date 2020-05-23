@@ -103,7 +103,6 @@ fun main() {
 
     app.after(AddHeader.addJSONHeader)
     app.after(AddHeader.addCrossOriginHeader)
-    app.after(AddHeader.addXTotalCountHeader)
 }
 
 object Main {

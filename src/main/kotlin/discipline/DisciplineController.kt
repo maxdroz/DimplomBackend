@@ -10,7 +10,9 @@ import utils.getAllParams
 
 object DisciplineController {
     val fetchAllDisciplines = Handler { ctx ->
-        ctx.json(Main.disciplineInteractor.getAll(ctx.getAllParams(), ctx.getCommonFilterWithSql()))
+        val filters = ctx.getCommonFilterWithSql()
+        ctx.header("X-Total-Count", Main.disciplineInteractor.getAllCountNoPagination(filters).toString())
+        ctx.json(Main.disciplineInteractor.getAll(ctx.getAllParams(), filters))
     }
 
     val getDiscipline = Handler { ctx ->

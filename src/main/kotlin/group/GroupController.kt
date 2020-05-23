@@ -10,7 +10,9 @@ import utils.getAllParams
 
 object GroupController {
     val fetchAllGroups = Handler { ctx ->
-        ctx.json(Main.groupInteractor.getAll(ctx.getAllParams(), ctx.getCommonFilterWithSql()))
+        val filters = ctx.getCommonFilterWithSql()
+        ctx.header("X-Total-Count", Main.groupInteractor.getAllCountNoPagination(filters).toString())
+        ctx.json(Main.groupInteractor.getAll(ctx.getAllParams(), filters))
     }
 
     val getGroup = Handler { ctx ->

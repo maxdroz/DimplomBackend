@@ -10,7 +10,9 @@ import utils.getAllParams
 
 object TeacherController {
     val fetchAllTeachers = Handler { ctx ->
-        ctx.json(Main.teacherInteractor.getAll(ctx.getAllParams(), ctx.getCommonFilterWithSql()))
+        val filters = ctx.getCommonFilterWithSql()
+        ctx.header("X-Total-Count", Main.teacherInteractor.getAllCountNoPagination(filters).toString())
+        ctx.json(Main.teacherInteractor.getAll(ctx.getAllParams(), filters))
     }
 
     val getTeacher = Handler { ctx ->

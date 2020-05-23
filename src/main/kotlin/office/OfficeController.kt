@@ -10,7 +10,9 @@ import utils.getAllParams
 
 object OfficeController {
     val fetchAllOffices = Handler { ctx ->
-        ctx.json(Main.officeInteractor.getAll(ctx.getAllParams(), ctx.getCommonFilterWithSql()))
+        val filters = ctx.getCommonFilterWithSql()
+        ctx.header("X-Total-Count", Main.officeInteractor.getAllCountNoPagination(filters).toString())
+        ctx.json(Main.officeInteractor.getAll(ctx.getAllParams(), filters))
     }
 
     val getOffice = Handler {ctx ->

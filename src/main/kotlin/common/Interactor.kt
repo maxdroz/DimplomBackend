@@ -5,17 +5,17 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-abstract class Interactor<T, Filter>(private val connection: Connection) {
+abstract class Interactor<T, FilterClass : Filter>(private val connection: Connection) {
     abstract val tableParams: String
     abstract val tableName: String
     abstract val insertQuery: String
     abstract val editQuery: String
     abstract val referenceName: String
 
-    abstract fun addParamsToQueryForSearch(st: PreparedStatement, filter: Filter)
-    abstract fun getSearchPathQuery(filter: Filter): String
+    abstract fun addParamsToQueryForSearch(st: PreparedStatement, filter: FilterClass)
+    abstract fun getSearchPathQuery(filter: FilterClass): String
 
-    fun getAll(params: GetAllParams?, filter: Filter?): List<T> {
+    fun getAll(params: GetAllParams?, filter: FilterClass?): List<T> {
         val searchQuery = if (filter == null) "" else getSearchPathQuery(filter)
         val query = when (params) {
             null -> "SELECT $tableParams FROM $tableName $searchQuery"
@@ -42,6 +42,20 @@ abstract class Interactor<T, Filter>(private val connection: Connection) {
             ans.add(res.getObject())
         }
         return ans
+    }
+
+    fun getAllCountNoPagination(filter: FilterClass?): Int {
+        if(filter == null) return getCount()
+        val query = "SELECT COUNT(*) FROM $tableName ${getSearchPathQuery(filter)}"
+        val st = connection.prepareStatement(query)
+        addParamsToQueryForSearch(st, filter)
+
+        val res = st.executeQuery()
+        return if (res.next()) {
+            res.getInt(1)
+        } else {
+            0
+        }
     }
 
     open fun String.toDBName(): String {
@@ -84,7 +98,7 @@ abstract class Interactor<T, Filter>(private val connection: Connection) {
         return res.getObject()
     }
 
-    fun getCount(): Int {
+    private fun getCount(): Int {
         val st = connection.createStatement()
         val res = st.executeQuery("SELECT COUNT(*) FROM $tableName")
         res.next()

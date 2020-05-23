@@ -2,6 +2,7 @@ package lesson
 
 import com.google.gson.*
 import com.google.gson.annotations.Expose
+import common.getCommonFilterWithSql
 import common.getLessonFilter
 import discipline.Discipline
 import group.Group
@@ -102,7 +103,9 @@ object LessonController {
     }
 
     val fetchAllLessons = Handler { ctx ->
-        ctx.html(adminGson.toJson(Main.lessonInteractor.getAll(ctx.getAllParams(), ctx.getLessonFilter())))
+        val filters = ctx.getLessonFilter()
+        ctx.header("X-Total-Count", Main.lessonInteractor.getAllCountNoPagination(filters).toString())
+        ctx.html(adminGson.toJson(Main.lessonInteractor.getAll(ctx.getAllParams(), filters)))
     }
 
     val getLesson = Handler { ctx ->

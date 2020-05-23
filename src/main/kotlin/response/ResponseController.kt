@@ -24,7 +24,3 @@ object ResponseController {
     const val ERROR_REASON_KEY = "error_reason"
 }
 
-fun Context.showError(reason: String) {
-    sessionAttribute(ERROR_REASON_KEY, reason)
-//    redirect(Path.ERROR)
-}
