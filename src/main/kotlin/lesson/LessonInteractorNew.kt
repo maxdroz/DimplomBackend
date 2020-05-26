@@ -27,7 +27,8 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
         val teacher = if(filter.teacher != null) "AND id_teacher = ?" else ""
         val office = if(filter.office != null) "AND id_office = ?" else ""
         val group = if(filter.group != null) "AND id_group = ?" else ""
-        return "WHERE 1 = 1 $teacher $office $group "
+        val discipline = if(filter.discipline != null) "AND id_discipline = ?" else ""
+        return "WHERE 1 = 1 $teacher $office $group $discipline"
     }
 
     @Suppress("UNUSED_CHANGED_VALUE")
@@ -36,6 +37,7 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
         if(filter.teacher != null) st.setInt(id++, filter.teacher)
         if(filter.office != null) st.setInt(id++, filter.office)
         if(filter.group != null) st.setInt(id++, filter.group)
+        if(filter.discipline != null) st.setInt(id++, filter.discipline)
     }
 
     override fun addParamsToQueryForInsert(st: PreparedStatement, obj: Lesson) {

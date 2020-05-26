@@ -11,17 +11,19 @@ class CommonFilter(
 data class LessonFilter(
     val teacher: Int?,
     val office: Int?,
-    val group: Int?
+    val group: Int?,
+    val discipline: Int?
 ): Filter
 
 fun Context.getLessonFilter(): LessonFilter? {
     val teacher = queryParam("teacher")?.toIntOrNull()
     val office = queryParam("office")?.toIntOrNull()
     val group = queryParam("group")?.toIntOrNull()
-    if(teacher == null && office == null && group == null) {
+    val discipline = queryParam("discipline")?.toIntOrNull()
+    if(teacher == null && office == null && group == null && discipline == null) {
         return null
     }
-    return LessonFilter(teacher, office, group)
+    return LessonFilter(teacher, office, group, discipline)
 }
 
 fun Context.getCommonFilterWithSql(): CommonFilter? {

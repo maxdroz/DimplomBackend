@@ -5,19 +5,26 @@ import group.GroupInteractorNew
 import response.ResponseController
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
+import io.javalin.core.security.SecurityUtil.roles
 import lesson.LessonController
 import lesson.LessonInteractorNew
+import login.LoginController
+import login.Roles
 import office.OfficeController
 import office.OfficeInteractorNew
 import teacher.TeacherController
 import teacher.TeacherInteractorNew
+import users.UserController
+import users.UserInteractor
 import utils.AddHeader
 import utils.Path
+import javax.management.relation.Role
 
 fun main() {
     val app = Javalin.create { config ->
         config.enableDevLogging()
         config.enableCorsForAllOrigins()
+        config.accessManager(LoginController.accessManager)
     }.start(80)
 
 //    app.before(LoginController.ensureLoginBeforeEditing)
@@ -29,69 +36,90 @@ fun main() {
 
     app.routes {
         path(Path.TEACHERS) {
-            get(TeacherController.fetchAllTeachers)
-            post(TeacherController.addTeacher)
-            post("/check", TeacherController.canDeleteTeacher)
+            get(TeacherController.fetchAllTeachers, roles(Roles.WORKER, Roles.ADMIN))
+            post(TeacherController.addTeacher, roles(Roles.WORKER, Roles.ADMIN))
+            post("/check", TeacherController.canDeleteTeacher, roles(Roles.WORKER, Roles.ADMIN))
             path(":teacher-id") {
-                get(TeacherController.getTeacher)
-                put(TeacherController.editTeacher)
-                delete(TeacherController.deleteTeacher)
+                get(TeacherController.getTeacher, roles(Roles.WORKER, Roles.ADMIN))
+                put(TeacherController.editTeacher, roles(Roles.WORKER, Roles.ADMIN))
+                delete(TeacherController.deleteTeacher, roles(Roles.WORKER, Roles.ADMIN))
             }
         }
 
         path(Path.DISCIPLINES) {
-            get(DisciplineController.fetchAllDisciplines)
-            post(DisciplineController.addDiscipline)
-            post("/check", DisciplineController.canDeleteDiscipline)
+            get(DisciplineController.fetchAllDisciplines, roles(Roles.WORKER, Roles.ADMIN))
+            post(DisciplineController.addDiscipline, roles(Roles.WORKER, Roles.ADMIN))
+            post("/check", DisciplineController.canDeleteDiscipline, roles(Roles.WORKER, Roles.ADMIN))
             path(":discipline-id") {
-                get(DisciplineController.getDiscipline)
-                put(DisciplineController.editDiscipline)
-                delete(DisciplineController.deleteDiscipline)
+                get(DisciplineController.getDiscipline, roles(Roles.WORKER, Roles.ADMIN))
+                put(DisciplineController.editDiscipline, roles(Roles.WORKER, Roles.ADMIN))
+                delete(DisciplineController.deleteDiscipline, roles(Roles.WORKER, Roles.ADMIN))
             }
         }
 
         path(Path.OFFICES) {
-            get(OfficeController.fetchAllOffices)
-            post(OfficeController.addOffice)
-            post("/check", OfficeController.canDeleteOffice)
+            get(OfficeController.fetchAllOffices, roles(Roles.WORKER, Roles.ADMIN))
+            post(OfficeController.addOffice, roles(Roles.WORKER, Roles.ADMIN))
+            post("/check", OfficeController.canDeleteOffice, roles(Roles.WORKER, Roles.ADMIN))
             path(":office-id") {
-                get(OfficeController.getOffice)
-                put(OfficeController.editOffice)
-                delete(OfficeController.deleteOffice)
+                get(OfficeController.getOffice, roles(Roles.WORKER, Roles.ADMIN))
+                put(OfficeController.editOffice, roles(Roles.WORKER, Roles.ADMIN))
+                delete(OfficeController.deleteOffice, roles(Roles.WORKER, Roles.ADMIN))
             }
         }
 
         path(Path.GROUPS) {
-            get(GroupController.fetchAllGroups)
-            post(GroupController.addGroup)
-            post("/check", GroupController.canDeleteGroup)
+            get(GroupController.fetchAllGroups, roles(Roles.WORKER, Roles.ADMIN))
+            post(GroupController.addGroup, roles(Roles.WORKER, Roles.ADMIN))
+            post("/check", GroupController.canDeleteGroup, roles(Roles.WORKER, Roles.ADMIN))
             path(":group-id") {
-                get(GroupController.getGroup)
-                put(GroupController.editGroup)
-                delete(GroupController.deleteGroup)
+                get(GroupController.getGroup, roles(Roles.WORKER, Roles.ADMIN))
+                put(GroupController.editGroup, roles(Roles.WORKER, Roles.ADMIN))
+                delete(GroupController.deleteGroup, roles(Roles.WORKER, Roles.ADMIN))
             }
         }
 
         path(Path.LESSONS) {
-            get(LessonController.fetchAllLessons)
-            post(LessonController.addLesson)
-            post("/check", LessonController.canDeleteLesson)
+            get(LessonController.fetchAllLessons, roles(Roles.WORKER, Roles.ADMIN))
+            post(LessonController.addLesson, roles(Roles.WORKER, Roles.ADMIN))
+            post("/check", LessonController.canDeleteLesson, roles(Roles.WORKER, Roles.ADMIN))
             path(":lesson-id") {
-                get(LessonController.getLesson)
-                put(LessonController.editLesson)
-                delete(LessonController.deleteLesson)
+                get(LessonController.getLesson, roles(Roles.WORKER, Roles.ADMIN))
+                put(LessonController.editLesson, roles(Roles.WORKER, Roles.ADMIN))
+                delete(LessonController.deleteLesson, roles(Roles.WORKER, Roles.ADMIN))
             }
+        }
+
+        path(Path.USERS) {
+            get(UserController.fetchAllUsers, roles(Roles.ADMIN))
+            post(UserController.addUser, roles(Roles.ADMIN))
+            path(":username") {
+                get(UserController.getUser, roles(Roles.ADMIN))
+                put(UserController.editUser, roles(Roles.ADMIN))
+                delete(UserController.deleteUser, roles(Roles.ADMIN))
+            }
+            path("isUsernameTaken") {
+                post(UserController.isUsernameTaken, roles(Roles.ADMIN))
+            }
+        }
+
+        path("changePassword") {
+            post(UserController.updatePassword, roles(Roles.WORKER, Roles.ADMIN))
+        }
+
+        path(Path.AUTHORIZE) {
+            post(UserController.authorizeCallback, roles(Roles.ANYONE))
         }
 
         path(Path.USER_API) {
             path(Path.TEACHERS) {
-                get(TeacherController.fetchAllTeachers)
+                get(TeacherController.fetchAllTeachers, roles(Roles.ANYONE))
             }
             path(Path.LESSONS) {
-                get(LessonController.fetchAllLessonsForUser)
+                get(LessonController.fetchAllLessonsForUser, roles(Roles.ANYONE))
             }
             path(Path.GROUPS) {
-                get(GroupController.fetchAllGroupsUser)
+                get(GroupController.fetchAllGroupsUser, roles(Roles.ANYONE))
             }
         }
     }
@@ -111,4 +139,5 @@ object Main {
     val lessonInteractor = LessonInteractorNew(DB.conn)
     val officeInteractor = OfficeInteractorNew(DB.conn)
     val groupInteractor = GroupInteractorNew(DB.conn)
+    val userInteractor = UserInteractor(DB.conn)
 }

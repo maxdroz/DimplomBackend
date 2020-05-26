@@ -10,6 +10,8 @@ object Path {
     const val DISCIPLINES = "/disciplines"
     const val OFFICES = "/offices"
     const val GROUPS = "/groups"
+    const val USERS = "/users"
+    const val AUTHORIZE = "/authorize"
 
     const val USER_API = "/user_api"
 

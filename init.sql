@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS "lesson" (
 );
 
 
-
 CREATE TABLE IF NOT EXISTS "discipline" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
@@ -21,7 +20,6 @@ CREATE TABLE IF NOT EXISTS "discipline" (
 ) WITH (
   OIDS=FALSE
 );
-
 
 
 CREATE TABLE IF NOT EXISTS "teacher" (
@@ -37,7 +35,6 @@ CREATE TABLE IF NOT EXISTS "teacher" (
 );
 
 
-
 CREATE TABLE IF NOT EXISTS "office" (
 	"id" serial NOT NULL,
 	"office" TEXT NOT NULL,
@@ -51,6 +48,16 @@ CREATE TABLE IF NOT EXISTS "group" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
 	CONSTRAINT "group_pk" PRIMARY KEY ("id")
+) WITH (
+  OIDS=FALSE
+);
+
+
+CREATE TABLE IF NOT EXISTS "admin_panel_user" (
+	"username" TEXT NOT NULL,
+	"hashed_password" TEXT NOT NULL,
+	"roles" TEXT[] NOT NULL,
+	CONSTRAINT "user_pk" PRIMARY KEY ("username")
 ) WITH (
   OIDS=FALSE
 );
