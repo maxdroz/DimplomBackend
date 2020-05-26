@@ -113,6 +113,64 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
         return ans
     }
 
+    fun checkIfCouldInsertLesson(lesson: Lesson): String? {
+        val otherLessonOfTeacher = checkTeacherTimelineCollisions(lesson)
+        if(otherLessonOfTeacher != null) {
+            return "Пара с id $otherLessonOfTeacher уже идет у       этого преподавателя"
+        }
+        val otherLessonOfOffice = checkOfficeTimelineCollisions(lesson)
+        if(otherLessonOfOffice != null) {
+            return "Пара с id $otherLessonOfOffice уже идет в этой аудитории"
+        }
+        val otherLessonOfGroup = checkGroupTimelineCollisions(lesson)
+        if(otherLessonOfGroup != null) {
+            return "Пара с id $otherLessonOfGroup уже идет у этой группы"
+        }
+        //group has other class
+        //office is taken
+        //teacher has other class
+        return null
+    }
+
+    private fun checkGroupTimelineCollisions(lesson: Lesson): Int? { //lesson with error
+        val query = "SELECT lesson.id FROM lesson INNER JOIN \"group\" ON \"group\".id = lesson.id_group WHERE id_group = ? AND start_time < ? AND end_time > ? LIMIT 1"
+        val st = connection.prepareStatement(query)
+        st.setInt(1, lesson.group.id)
+        st.setTimestamp(2, lesson.endTime)
+        st.setTimestamp(3, lesson.startTime)
+        val res = st.executeQuery()
+        if (res.next()) {
+            return res.getInt(1)
+        }
+        return null
+    }
+
+    private fun checkOfficeTimelineCollisions(lesson: Lesson): Int? { //lesson with error
+        val query = "SELECT lesson.id FROM lesson INNER JOIN office ON office.id = lesson.id_office WHERE id_office = ? AND start_time < ? AND end_time > ? LIMIT 1"
+        val st = connection.prepareStatement(query)
+        st.setInt(1, lesson.office.id)
+        st.setTimestamp(2, lesson.endTime)
+        st.setTimestamp(3, lesson.startTime)
+        val res = st.executeQuery()
+        if (res.next()) {
+            return res.getInt(1)
+        }
+        return null
+    }
+
+    private fun checkTeacherTimelineCollisions(lesson: Lesson): Int? { //lesson with error
+        val query = "SELECT lesson.id FROM lesson INNER JOIN teacher ON teacher.id = lesson.id_teacher WHERE id_teacher = ? AND start_time < ? AND end_time > ? LIMIT 1"
+        val st = connection.prepareStatement(query)
+        st.setInt(1, lesson.teacher.id)
+        st.setTimestamp(2, lesson.endTime)
+        st.setTimestamp(3, lesson.startTime)
+        val res = st.executeQuery()
+        if (res.next()) {
+            return res.getInt(1)
+        }
+        return null
+    }
+
     private fun ResultSet.getLessonFull(): Lesson {
         val id = getInt("id")
         val startTime = getTimestamp("start_time")
@@ -124,7 +182,7 @@ class LessonInteractorNew(private val connection: Connection) : Interactor<Lesso
         return Lesson(id, startTime, endTime, discipline, teacher, office, group)
     }
 
-    fun ResultSet.getTeacher(): Teacher {
+    private fun ResultSet.getTeacher(): Teacher {
         val id = getInt("id_teacher")
         val name = getString("teacher_name")
         val surname = getString("surname")

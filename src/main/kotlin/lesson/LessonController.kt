@@ -110,7 +110,12 @@ object LessonController {
 
     val addLesson = Handler { ctx ->
         val data = userGson.fromJson(ctx.body(), Lesson::class.java)
-        ctx.html(adminGson.toJson(Main.lessonInteractor.add(data)))
+        val res = Main.lessonInteractor.checkIfCouldInsertLesson(data)
+        if(res != null) {
+            ctx.status(500).json(mapOf("message" to res))
+        } else {
+            ctx.html(adminGson.toJson(Main.lessonInteractor.add(data)))
+        }
     }
 
     val editLesson = Handler { ctx ->

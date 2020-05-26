@@ -44,8 +44,9 @@ object UserController {
         val user = Main.userInteractor.getUserByUsername(ctx.basicAuthCredentials().username)
         val changePassword = Gson().fromJson(ctx.body(), ChangePasswordView::class.java)
         if(changePassword.oldPassword.hashSHA256() == user?.hashedPassword) {
-            Main.userInteractor.updatePassword(user.username, changePassword.password.hashSHA256())
-            ctx.json(mapOf("success" to true, "token" to generateToken(user.username, changePassword.password)))
+            val hashedPassword = changePassword.password.hashSHA256()
+            Main.userInteractor.updatePassword(user.username, hashedPassword)
+            ctx.json(mapOf("success" to true, "token" to generateToken(user.username, hashedPassword)))
         } else {
             ctx.json(mapOf("success" to false))
         }
@@ -59,7 +60,7 @@ object UserController {
         } else {
             ctx.json(
                 mapOf(
-                    "credentials" to "Basic ${generateToken(dbUser.username, dbUser.hashedPassword)}",
+                    "credentials" to generateToken(dbUser.username, dbUser.hashedPassword),
                     "roles" to dbUser.roles,
                     "username" to dbUser.username
                 )
@@ -68,7 +69,7 @@ object UserController {
     }
 
     private fun generateToken(username: String, hashedPassword: String): String {
-        return Base64.getEncoder().encode(("$username:$hashedPassword").toByteArray())
+        return "Basic " + Base64.getEncoder().encode(("$username:$hashedPassword").toByteArray())
             .toString(StandardCharsets.UTF_8)
     }
 
