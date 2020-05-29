@@ -30,7 +30,7 @@ fun main() {
 //    app.before(LoginController.ensureLoginBeforeEditing)
 //    app.options("*", OptionsController.optionsRequest)
     app.before {
-//        Thread.sleep(1000)
+//        Thread.sleep(3000)
     }
 
 
