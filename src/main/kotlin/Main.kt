@@ -2,7 +2,6 @@ import discipline.DisciplineController
 import discipline.DisciplineInteractorNew
 import group.GroupController
 import group.GroupInteractorNew
-import response.ResponseController
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
 import io.javalin.core.security.SecurityUtil.roles
@@ -12,20 +11,21 @@ import login.LoginController
 import login.Roles
 import office.OfficeController
 import office.OfficeInteractorNew
+import response.ResponseController
 import teacher.TeacherController
 import teacher.TeacherInteractorNew
 import users.UserController
 import users.UserInteractor
 import utils.AddHeader
 import utils.Path
-import javax.management.relation.Role
 
 fun main() {
+
     val app = Javalin.create { config ->
         config.enableDevLogging()
         config.enableCorsForAllOrigins()
         config.accessManager(LoginController.accessManager)
-    }.start(80)
+    }.start(getHerokuAssignedPort())
 
 //    app.before(LoginController.ensureLoginBeforeEditing)
 //    app.options("*", OptionsController.optionsRequest)
@@ -131,6 +131,11 @@ fun main() {
 
     app.after(AddHeader.addJSONHeader)
     app.after(AddHeader.addCrossOriginHeader)
+}
+
+private fun getHerokuAssignedPort(): Int {
+    val herokuPort = System.getenv("PORT")
+    return herokuPort?.toInt() ?: 80
 }
 
 object Main {
