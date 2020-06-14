@@ -33,6 +33,7 @@ fun main() {
 //        Thread.sleep(3000)
     }
 
+    DB.conn
 
     app.routes {
         path(Path.TEACHERS) {
