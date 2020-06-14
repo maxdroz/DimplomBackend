@@ -72,3 +72,7 @@ ALTER TABLE "lesson" ADD CONSTRAINT "lesson_fk0" FOREIGN KEY ("id_discipline") R
 ALTER TABLE "lesson" ADD CONSTRAINT "lesson_fk1" FOREIGN KEY ("id_teacher") REFERENCES "teacher"("id");
 ALTER TABLE "lesson" ADD CONSTRAINT "lesson_fk2" FOREIGN KEY ("id_office") REFERENCES "office"("id");
 ALTER TABLE "lesson" ADD CONSTRAINT "lesson_fk3" FOREIGN KEY ("id_group") REFERENCES "group"("id");
+
+INSERT INTO admin_panel_user (username, hashed_password, roles)
+SELECT 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', ARRAY['ADMIN']
+WHERE NOT EXISTS (SELECT * FROM admin_panel_user);

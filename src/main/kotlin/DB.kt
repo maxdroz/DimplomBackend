@@ -5,7 +5,7 @@ import java.sql.DriverManager
 private const val DATABASE_NAME = "testdb"
 private const val DATABASE_USER = "postgres"
 private const val DATABASE_PASSWORD = "a"
-private const val DATABASE_URL = "jdbc:postgresql://192.168.0.25/"
+private const val DATABASE_URL = "jdbc:postgresql://localhost/"
 
 class DB {
     companion object {

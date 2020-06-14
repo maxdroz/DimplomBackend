@@ -1,8 +1,6 @@
 package users
 
-import com.sun.org.apache.xml.internal.security.algorithms.implementations.SignatureDSA
 import login.Roles
-import sun.security.provider.SHA
 
 data class UserViewRawPassword(
     val id: String,
